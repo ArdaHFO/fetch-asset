@@ -9,7 +9,7 @@
 
 <p align="center">
   <a href="README.md">English</a> · <strong>Türkçe</strong><br />
-  <a href="#iş-akışını-dene"><strong>İş akışını keşfet</strong></a> ·
+  <a href="#workflow"><strong>İş akışını keşfet</strong></a> ·
   <a href="https://fetch-asset.vercel.app">Proje sitesi</a> ·
   <a href="#yerel-olarak-çalıştır">Yerel kurulum</a>
 </p>
@@ -19,6 +19,8 @@
 Proje oluştur, müşteriden gerekenleri belirt ve tek bir portal bağlantısı paylaş. Müşteriler ajans hesabı açmadan dosya ve yanıt gönderebilir. Gönderileri incele, düzeltme iste ve projenin gereksinimlerini, tarihlerini ve ilerlemesini birlikte takip et.
 
 **Bu repo harici hizmetlerle çalışan bir web uygulaması ve ayrı bir rehberli demo içerir.** Supabase, Groq, MailerSend ve Stripe entegrasyonlarının kendi yapılandırmaları gerekir. Rehberli demo etkileşimleri simüle eder ve canlı yükleme, e-posta teslimi veya ödeme işlemlerini doğrulamaz.
+
+<a id="workflow"></a>
 
 ## İş akışını dene
 
