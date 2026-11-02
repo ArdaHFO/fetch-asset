@@ -1,3 +1,5 @@
+FetchAsset helps agencies collect files and information from clients through one shared project page.
+
 <p align="center">
   <img src="public/favicon.svg" width="112" alt="FetchAsset F and paperclip icon" />
 </p>
@@ -52,8 +54,8 @@ For files, the AI audit evaluates metadata such as name, type and size. It does 
 The lockfile records **Next.js 14.2.35** and **React 18.3.1**. The application uses TypeScript and Tailwind CSS 3. Select a Node.js version compatible with the dependency engines in `package-lock.json`.
 
 ```bash
-git clone https://github.com/ArdaHFO/FetchAsset.git
-cd FetchAsset
+git clone https://github.com/ArdaHFO/fetch-asset.git
+cd fetch-asset
 npm ci
 ```
 
@@ -110,7 +112,7 @@ This documentation was checked against routes, service adapters, SQL migrations,
 - File audits are metadata-based. Text audits pass up to 2,000 characters of submitted text to the model.
 - The submission route starts its AI audit with a non-blocking HTTP request. The repository does not establish a durable background queue for that work.
 - Reminder checks are exposed through an authenticated endpoint. A deployed automatic schedule must be configured and verified separately.
-- Plan configuration includes Solo, while the webhook price-ID mapping explicitly handles Pro and Agency. Validate plan assignment before using Solo billing.
+- The webhook maps configured price IDs to Solo, Pro and Agency. Validate plan assignment with a complete checkout and webhook round trip before enabling paid access.
 - No automated test script or CI workflow is included in the inspected tree. The build configuration skips ESLint during builds, so a successful build would not establish lint success.
 - Storage policies, portal authorization, provider availability and delivery behavior need validation in the intended deployment.
 
@@ -131,11 +133,10 @@ public/                Existing brand and decorative assets
 - [AI audit implementation](src/lib/ai/audit.ts)
 - [Email service](src/lib/email/index.ts) · [Billing plans](src/lib/stripe/plans.ts)
 - [Design conventions](.github/copilot-instructions.md)
-- [Issues and feature requests](https://github.com/ArdaHFO/FetchAsset/issues)
+- [Issues and feature requests](https://github.com/ArdaHFO/fetch-asset/issues)
 
 For bug reports, identify the agency or client flow, request type, observed status and reproduction steps. Use sample files and redact portal tokens, credentials and client information. Pull requests should preserve the established UI style and describe which integrations were actually exercised.
 
 ## License and credits
 
 `package.json` declares **ISC**, but no standalone license file is included in the repository. This documentation does not add or change licensing terms. Existing brand assets, fonts and third-party packages retain their respective rights and notices.
-

@@ -10,6 +10,7 @@ export const runtime = 'nodejs'
 // ── Plan detection ────────────────────────────────────────────────────────────
 
 function planFromPriceId(priceId: string): PlanTier {
+  if (priceId === process.env.STRIPE_SOLO_PRICE_ID) return 'solo'
   if (priceId === process.env.STRIPE_PRO_PRICE_ID) return 'pro'
   if (priceId === process.env.STRIPE_AGENCY_PRICE_ID) return 'agency'
   return 'free'
@@ -29,16 +30,18 @@ async function updateProfile(
 
   if (error) {
     console.error('[stripe/webhook] Profile update error:', error.message)
+    throw error
   }
 }
 
 async function getUserIdFromCustomer(customerId: string): Promise<string | null> {
   const admin = createAdminClient()
-  const { data } = await (admin as any)
+  const { data, error } = await (admin as any)
     .from('profiles')
     .select('id')
     .eq('stripe_customer_id', customerId)
-    .single()
+    .maybeSingle()
+  if (error) throw error
   return data?.id ?? null
 }
 

@@ -31,15 +31,31 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Invalid or expired portal link.' }, { status: 403 })
     }
 
-    // Server-side file extension validation
-    if (requestType === 'file' && file) {
-      const { data: assetReqForValidation } = await (admin as any)
-        .from('asset_requests')
-        .select('allowed_file_types')
-        .eq('id', requestId)
-        .single()
+    // Bind the request and its rules to the project authorized by the portal token.
+    const { data: assetReqForValidation, error: requestError } = await (admin as any)
+      .from('asset_requests')
+      .select('request_type, allowed_file_types, max_file_size_mb')
+      .eq('id', requestId)
+      .eq('project_id', projectId)
+      .single()
 
-      const allowedExts = assetReqForValidation?.allowed_file_types as string[] | null
+    if (requestError || !assetReqForValidation) {
+      return NextResponse.json({ error: 'Asset request not found in this project.' }, { status: 404 })
+    }
+    if (requestType !== assetReqForValidation.request_type) {
+      return NextResponse.json({ error: 'Invalid request type.' }, { status: 400 })
+    }
+    if (requestType === 'file' && (!file || typeof file.arrayBuffer !== 'function')) {
+      return NextResponse.json({ error: 'Please provide a file.' }, { status: 400 })
+    }
+
+    // Enforce upload rules before reading or storing the file.
+    if (requestType === 'file' && file) {
+      const maxSizeMb = assetReqForValidation.max_file_size_mb
+      if (maxSizeMb != null && file.size > maxSizeMb * 1024 * 1024) {
+        return NextResponse.json({ error: `File exceeds the ${maxSizeMb} MB limit.` }, { status: 400 })
+      }
+      const allowedExts = assetReqForValidation.allowed_file_types as string[] | null
       if (allowedExts && allowedExts.length > 0) {
         const ext = file.name.split('.').pop()?.toLowerCase() ?? ''
         const ok  = allowedExts.some(
@@ -148,7 +164,11 @@ export async function POST(request: NextRequest) {
       } else {
         Object.assign(updatePayload, { value_text: valueText, file_name: null, file_path: null, file_size_bytes: null, file_mime_type: null, file_url: null })
       }
-      await (admin as any).from('submissions').update(updatePayload).eq('id', existingSub.id)
+      const { error: updateError } = await (admin as any).from('submissions').update(updatePayload).eq('id', existingSub.id)
+      if (updateError) {
+        console.error('[portal/submit] Submission update error:', updateError.message)
+        return NextResponse.json({ error: 'Failed to save submission.' }, { status: 500 })
+      }
       submissionId = existingSub.id
     } else {
       // Insert new submission
@@ -183,7 +203,7 @@ export async function POST(request: NextRequest) {
     fetch(`${appUrl}/api/ai/audit`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ submissionId }),
+      body: JSON.stringify({ submissionId, token }),
     }).catch((err) => console.error('[portal/submit] Audit trigger failed:', err))
 
     // Fire-and-forget emails

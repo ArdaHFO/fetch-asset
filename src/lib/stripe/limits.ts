@@ -6,11 +6,12 @@ import type { PlanTier } from '@/lib/supabase/types'
 
 export async function getUserPlan(userId: string): Promise<PlanTier> {
   const admin = createAdminClient()
-  const { data } = await (admin as any)
+  const { data, error } = await (admin as any)
     .from('profiles')
     .select('plan')
     .eq('id', userId)
-    .single()
+    .maybeSingle()
+  if (error) throw error
   return (data?.plan as PlanTier) ?? 'free'
 }
 
@@ -22,11 +23,14 @@ export async function assertCanCreateProject(userId: string): Promise<void> {
   if (limit === -1) return
 
   const admin = createAdminClient()
-  const { count } = await (admin as any)
+  const { count, error } = await (admin as any)
     .from('projects')
     .select('id', { count: 'exact', head: true })
     .eq('owner_id', userId)
     .in('status', ['draft', 'active'])
+
+  if (error) throw error
+  if (count == null) throw new Error('Project usage could not be determined.')
 
   if ((count ?? 0) >= limit) {
     throw new PlanLimitError(
@@ -47,10 +51,13 @@ export async function assertCanAddRequest(
   if (limit === -1) return
 
   const admin = createAdminClient()
-  const { count } = await (admin as any)
+  const { count, error } = await (admin as any)
     .from('asset_requests')
     .select('id', { count: 'exact', head: true })
     .eq('project_id', projectId)
+
+  if (error) throw error
+  if (count == null) throw new Error('Request usage could not be determined.')
 
   if ((count ?? 0) >= limit) {
     throw new PlanLimitError(
@@ -73,21 +80,26 @@ export async function assertCanAudit(userId: string): Promise<void> {
   startOfMonth.setHours(0, 0, 0, 0)
 
   // Fetch user's project IDs first, then count audits
-  const { data: userProjects } = await (admin as any)
+  const { data: userProjects, error: projectsError } = await (admin as any)
     .from('projects')
     .select('id')
     .eq('owner_id', userId)
 
+  if (projectsError) throw projectsError
+
   const projectIds: string[] = (userProjects ?? []).map((p: { id: string }) => p.id)
 
-  const { count } = projectIds.length === 0
-    ? { count: 0 }
+  const { count, error: countError } = projectIds.length === 0
+    ? { count: 0, error: null }
     : await (admin as any)
         .from('submissions')
         .select('id', { count: 'exact', head: true })
         .eq('ai_audit_status', 'complete')
         .gte('updated_at', startOfMonth.toISOString())
         .in('project_id', projectIds)
+
+  if (countError) throw countError
+  if (count == null) throw new Error('Audit usage could not be determined.')
 
   if ((count ?? 0) >= limit) {
     throw new PlanLimitError(
@@ -115,10 +127,12 @@ export async function getUsageStats(userId: string): Promise<UsageStats> {
   startOfMonth.setHours(0, 0, 0, 0)
 
   // Fetch project IDs first to avoid passing a query builder to .in()
-  const { data: userProjectRows } = await (admin as any)
+  const { data: userProjectRows, error: projectsError } = await (admin as any)
     .from('projects')
     .select('id, status')
     .eq('owner_id', userId)
+
+  if (projectsError) throw projectsError
 
   const allUserProjects: Array<{ id: string; status: string }> = userProjectRows ?? []
   const activeProjectIds = allUserProjects
@@ -126,15 +140,19 @@ export async function getUsageStats(userId: string): Promise<UsageStats> {
     .map((p) => p.id)
 
   const projectCount = activeProjectIds.length
+  const allProjectIds = allUserProjects.map((p) => p.id)
 
-  const { count: auditCount } = activeProjectIds.length === 0
-    ? { count: 0 }
+  const { count: auditCount, error: countError } = allProjectIds.length === 0
+    ? { count: 0, error: null }
     : await (admin as any)
         .from('submissions')
         .select('id', { count: 'exact', head: true })
         .eq('ai_audit_status', 'complete')
         .gte('updated_at', startOfMonth.toISOString())
-        .in('project_id', activeProjectIds)
+        .in('project_id', allProjectIds)
+
+  if (countError) throw countError
+  if (auditCount == null) throw new Error('Audit usage could not be determined.')
 
   return {
     plan,

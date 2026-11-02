@@ -1,3 +1,5 @@
+FetchAsset, ajansların müşterilerinden dosya ve bilgi toplamasını tek bir proje sayfasında kolaylaştırır.
+
 <p align="center">
   <img src="public/favicon.svg" width="112" alt="FetchAsset F ve ataş simgesi" />
 </p>
@@ -54,8 +56,8 @@ Dosyalarda yapay zekâ incelemesi ad, tür ve boyut gibi metadata'yı değerlend
 Kilit dosyasında **Next.js 14.2.35** ve **React 18.3.1** bulunur. Uygulama TypeScript ve Tailwind CSS 3 kullanır. `package-lock.json` içindeki bağımlılıkların engine koşullarıyla uyumlu bir Node.js sürümü seç.
 
 ```bash
-git clone https://github.com/ArdaHFO/FetchAsset.git
-cd FetchAsset
+git clone https://github.com/ArdaHFO/fetch-asset.git
+cd fetch-asset
 npm ci
 ```
 
@@ -112,7 +114,7 @@ Bu belgeler rotalar, hizmet bağdaştırıcıları, SQL migration'ları, paket b
 - Dosya incelemeleri metadata'ya dayanır. Metin incelemeleri gönderilen metnin en fazla 2.000 karakterini modele iletir.
 - Gönderi rotası yapay zekâ incelemesini yanıtı beklenmeyen HTTP isteğiyle başlatır. Repoda bu işlem için kalıcı bir arka plan kuyruğu kurulmuş değildir.
 - Hatırlatma kontrolleri oturum gerektiren uç noktadan sunulur. Dağıtımdaki otomatik zamanlama ayrıca yapılandırılıp doğrulanmalıdır.
-- Plan yapılandırması Solo içerir, webhook fiyat eşlemesi ise Pro ve Agency'yi açıkça işler. Solo ödemesini kullanmadan önce plan atamasını doğrula.
+- Webhook, yapılandırılan fiyat kimliklerini Solo, Pro ve Agency planlarıyla eşler. Ücretli erişimi açmadan önce tam ödeme ve webhook akışıyla plan atamasını doğrula.
 - İncelenen dosya ağacında otomatik test komutu veya CI iş akışı yoktur. Derleme yapılandırması build sırasında ESLint'i atlar. Başarılı derleme, lint başarısı anlamına gelmez.
 - Depolama politikaları, portal yetkilendirmesi, sağlayıcı erişimi ve teslim davranışı hedef dağıtımda doğrulanmalıdır.
 
@@ -133,11 +135,10 @@ public/               Mevcut marka ve dekoratif görseller
 - [Yapay zekâ inceleme uygulaması](src/lib/ai/audit.ts)
 - [E-posta hizmeti](src/lib/email/index.ts) · [Ödeme planları](src/lib/stripe/plans.ts)
 - [Tasarım kuralları](.github/copilot-instructions.md)
-- [Hata bildirimleri ve özellik talepleri](https://github.com/ArdaHFO/FetchAsset/issues)
+- [Hata bildirimleri ve özellik talepleri](https://github.com/ArdaHFO/fetch-asset/issues)
 
 Hata bildiriminde ajans veya müşteri akışını, talep türünü, gözlenen durumu ve yeniden üretme adımlarını belirt. Örnek dosyalar kullan. Portal token'larını, kimlik bilgilerini ve müşteri verilerini çıkar. Pull request'lerde mevcut arayüz stilini koru ve hangi entegrasyonların gerçekten çalıştırıldığını açıkla.
 
 ## Lisans ve kaynaklar
 
 `package.json` içinde **ISC** belirtilir, ancak repoda bağımsız lisans dosyası bulunmaz. Bu belgeler lisans koşulu eklemez veya değiştirmez. Mevcut marka görselleri, yazı tipleri ve üçüncü taraf paketler kendi haklarını ve bildirimlerini korur.
-

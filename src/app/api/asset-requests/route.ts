@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { assertCanAddRequest, PlanLimitError } from '@/lib/stripe/limits'
 import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 
@@ -59,6 +60,8 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }
 
+    await assertCanAddRequest(userId, project_id)
+
     // Insert the asset request
     const { data, error } = await admin
       .from('asset_requests')
@@ -73,6 +76,9 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ data })
   } catch (err) {
+    if (err instanceof PlanLimitError) {
+      return NextResponse.json({ error: err.message, code: err.code }, { status: 403 })
+    }
     console.error('[asset-requests POST] Unexpected error:', err)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }

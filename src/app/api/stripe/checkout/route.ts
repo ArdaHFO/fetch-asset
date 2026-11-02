@@ -41,7 +41,7 @@ async function buildPromoOptions(
 }
 
 /**
- * POST /api/stripe/checkout?plan=pro|agency
+ * POST /api/stripe/checkout?plan=solo|pro|agency
  *
  * Creates a Stripe Checkout session and redirects to it.
  * Requires an authenticated agency session.
@@ -55,7 +55,7 @@ export async function POST(req: NextRequest) {
     }
 
     const plan = req.nextUrl.searchParams.get('plan') as PlanTier | null
-    if (!plan || !['pro', 'agency'].includes(plan)) {
+    if (!plan || !['solo', 'pro', 'agency'].includes(plan)) {
       return NextResponse.json({ error: 'Invalid plan' }, { status: 400 })
     }
 
