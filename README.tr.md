@@ -1,13 +1,11 @@
-FetchAsset, ajansların müşterilerinden dosya ve bilgi toplamasını tek bir proje sayfasında kolaylaştırır.
+FetchAsset, müşterilerin dosya ve yanıtlarını ortak bir proje sayfasında toplar.
+
 
 <p align="center">
   <img src="public/favicon.svg" width="112" alt="FetchAsset F ve ataş simgesi" />
 </p>
 
 <h1 align="center">FetchAsset</h1>
-
-<p align="center"><strong>Daha az takip. Daha net teslim.</strong></p>
-<p align="center">Paylaşılabilir portallar, gönderi incelemesi ve yapay zekâ destekli kontrollerle ajanslar için müşteri materyali toplama alanı.</p>
 
 <p align="center">
   <a href="README.md">English</a> · <strong>Türkçe</strong><br />
@@ -16,40 +14,29 @@ FetchAsset, ajansların müşterilerinden dosya ve bilgi toplamasını tek bir p
   <a href="#yerel-olarak-çalıştır">Yerel kurulum</a>
 </p>
 
----
-
-Proje oluştur, müşteriden gerekenleri belirt ve tek bir portal bağlantısı paylaş. Müşteriler ajans hesabı açmadan dosya ve yanıt gönderebilir. Gönderileri incele, düzeltme iste ve projenin gereksinimlerini, tarihlerini ve ilerlemesini birlikte takip et.
-
-**Bu repo harici hizmetlerle çalışan bir web uygulaması ve ayrı bir rehberli demo içerir.** Supabase, Groq, MailerSend ve Stripe entegrasyonlarının kendi yapılandırmaları gerekir. Rehberli demo etkileşimleri simüle eder ve canlı yükleme, e-posta teslimi veya ödeme işlemlerini doğrulamaz.
+Ajans bir kontrol listesi oluşturup müşteriye portal bağlantısını gönderir. Müşteri ajans hesabı açmadan materyal gönderebilir; ajans bunları onaylar veya düzeltme ister. Hesap, veri ve depolama için Supabase; inceleme, e-posta ve ödeme için Groq, MailerSend ve Stripe entegrasyonları kullanılır.
 
 <a id="workflow"></a>
 
 ## İş akışını dene
-
-| Alan | Beklenen davranış |
-| --- | --- |
-| Rehberli demo | Örnek proje ve simüle yükleme içeren `/demo` |
-| Ajans çalışma alanı | Oturum gerektiren panel, projeler, talepler ve inceleme |
-| Müşteri portalı | Token tabanlı `/portal/[token]` bağlantıları |
-| Veri ve depolama | Supabase veritabanı, Auth ve Storage |
-| Yapay zekâ incelemesi | Yapılandırılmış Llama 3.3 modeliyle Groq |
 
 1. Aşağıdaki yerel kurulumu tamamla ve rehberli örnek için [localhost:3000/demo](http://localhost:3000/demo) adresini aç.
 2. Gerçek bir proje için Supabase'i yapılandır, giriş yap ve müşteri bilgileriyle materyal taleplerini içeren proje oluştur.
 3. Üretilen portal bağlantısını ilgili müşteriyle paylaş.
 4. Gönderilen dosya veya yanıtları incele, onayla ya da düzeltme iste. Onaylanan dosyaları imzalı bağlantılarla indir.
 
-## Çalışma alanında neler var?
+`/demo` örneği yükleme ve incelemeyi simüle eder. Gerçek depolama, e-posta veya ödeme işlemlerini çalıştırmaz.
 
-- **Projeye özel talepler.** Gereksinimler ve açıklamalarla dosya, metin, URL ve çoktan seçmeli yanıt topla.
-- **Basit müşteri portalı.** Müşteri proje bağlantısını açar, kontrol listesini görür ve istenen materyali gönderir.
-- **İnceleme paneli.** Gönderileri değerlendir, durumu takip et, onay ver veya düzeltme geri bildirimi sun.
-- **Yapay zekâ destekli kontroller.** Gönderi metninden veya metadata'sından yapılandırılmış puan, sorunlar ve öneriler üret.
-- **Ajans markası.** Logo, renk, karşılama metni ve diğer portal görünüm ayarlarını düzenle.
-- **Tarihler ve iletişim.** Son tarihleri ve tampon süreleri kaydet, gönderi/inceleme bildirimleri gönder ve eksik maddeler için hatırlatma kontrolünü çağır.
-- **Ödeme entegrasyonu.** Stripe Checkout, ödeme portalı ve webhook rotaları abonelik planlarını kullanım sınırlarına bağlar.
+## Özellikler
 
-Dosyalarda yapay zekâ incelemesi ad, tür ve boyut gibi metadata'yı değerlendirir. Yüklenen dosyanın içeriğini incelemez. İnsan incelemesi teslim sürecinin bir parçasıdır.
+- Dosya, metin, URL ve çoktan seçmeli yanıt talepleri.
+- Gönderi durumu, onaylar ve düzeltme geri bildirimi.
+- Portal logosu, renkleri ve karşılama metni.
+- Proje son tarihleri, tampon süreler, bildirimler ve hatırlatma kontrolleri.
+- Gönderilen metinden veya dosya bilgilerinden üretilen yapay zekâ puanları ve önerileri.
+- Plan sınırlarına bağlı Stripe Checkout, ödeme portalı ve webhook rotaları.
+
+Dosya incelemesi içeriği okumaz; dosyanın adını, türünü ve boyutunu kullanır. Metin incelemesi modele en fazla 2.000 karakter gönderir.
 
 ## Yerel olarak çalıştır
 
@@ -91,11 +78,11 @@ npm run build
 npm start
 ```
 
-Bu komutlar belge güncellemesi sırasında çalıştırılmadı. Stripe ayrıca `/api/stripe/webhook` hedefi ve birbiriyle eşleşen test veya canlı kimlik bilgileri gerektirir. Ücretli erişimi açmadan önce ödeme ve webhook akışının tamamını doğrula.
+Stripe ayrıca `/api/stripe/webhook` hedefi ve birbiriyle eşleşen test veya canlı kimlik bilgileri gerektirir. Ücretli erişimi açmadan önce ödeme ve webhook akışının tamamını doğrula.
 
 ## Tasarım ve geliştirme
 
-FetchAsset'in mevcut arayüzü elle çizilmiş görünüm kullanır. Genişletirken düzensiz köşeleri, keskin ofset gölgeleri, kâğıt arka planını, **Kalam** başlıklarını ve **Patrick Hand** gövde yazısını koru.
+Arayüzde düzensiz köşeler, ofset gölgeler, kâğıt arka planı, **Kalam** başlıkları ve **Patrick Hand** gövde yazısı kullanılır. Yeni ekranlarda mevcut bileşenleri kullan.
 
 | Bileşen | Uygulama |
 | --- | --- |
@@ -106,17 +93,13 @@ FetchAsset'in mevcut arayüzü elle çizilmiş görünüm kullanır. Genişletir
 
 Temel palet kâğıt `#fdfbf7`, mürekkep `#2d2d2d`, vurgu `#ff4d4d`, mavi `#2d5da1` ve not kâğıdı sarısı `#fff9c4` kullanır. Mevcut [katkı yönergeleri](.github/copilot-instructions.md) tasarım kurallarını açıklar. Buradaki ilk aşama kontrol listesi geçmişe aittir ve güncel dosya ağacını anlatmaz.
 
-## Doğrulama ve mevcut sınırlar
+## Sınırlar
 
-Bu belgeler rotalar, hizmet bağdaştırıcıları, SQL migration'ları, paket bilgileri ve ortam şablonuyla karşılaştırıldı. Uygulama derlemesi, migration, canlı yükleme, yapay zekâ isteği, e-posta veya ödeme çalıştırılmadı.
-
-- Rehberli demo yükleme ve incelemeyi simüle eder. Gerçek portaldan ayrıdır.
-- Dosya incelemeleri metadata'ya dayanır. Metin incelemeleri gönderilen metnin en fazla 2.000 karakterini modele iletir.
-- Gönderi rotası yapay zekâ incelemesini yanıtı beklenmeyen HTTP isteğiyle başlatır. Repoda bu işlem için kalıcı bir arka plan kuyruğu kurulmuş değildir.
-- Hatırlatma kontrolleri oturum gerektiren uç noktadan sunulur. Dağıtımdaki otomatik zamanlama ayrıca yapılandırılıp doğrulanmalıdır.
-- Webhook, yapılandırılan fiyat kimliklerini Solo, Pro ve Agency planlarıyla eşler. Ücretli erişimi açmadan önce tam ödeme ve webhook akışıyla plan atamasını doğrula.
-- İncelenen dosya ağacında otomatik test komutu veya CI iş akışı yoktur. Derleme yapılandırması build sırasında ESLint'i atlar. Başarılı derleme, lint başarısı anlamına gelmez.
-- Depolama politikaları, portal yetkilendirmesi, sağlayıcı erişimi ve teslim davranışı hedef dağıtımda doğrulanmalıdır.
+- Gönderi rotası yapay zekâ incelemesini yanıtını beklemediği HTTP isteğiyle başlatır. Bu iş için kalıcı arka plan kuyruğu yoktur.
+- Hatırlatma uç noktası oturum gerektirir. Otomatik hatırlatmalar için ayrıca zamanlama yapılandırılmalıdır.
+- Stripe fiyat kimlikleri Solo, Pro ve Agency planlarına bağlanır. Ücretli erişimi açmadan önce tam ödeme/webhook döngüsünde plan atamasını kontrol et.
+- Otomatik test komutu veya CI iş akışı yoktur. Derleme ESLint'i atladığından lint'i ayrı çalıştır.
+- Kendi dağıtımında depolama politikalarını, portal yetkilendirmesini ve hizmetlerin teslim davranışını kontrol et.
 
 ## Proje yapısı
 
@@ -137,8 +120,8 @@ public/               Mevcut marka ve dekoratif görseller
 - [Tasarım kuralları](.github/copilot-instructions.md)
 - [Hata bildirimleri ve özellik talepleri](https://github.com/ArdaHFO/fetch-asset/issues)
 
-Hata bildiriminde ajans veya müşteri akışını, talep türünü, gözlenen durumu ve yeniden üretme adımlarını belirt. Örnek dosyalar kullan. Portal token'larını, kimlik bilgilerini ve müşteri verilerini çıkar. Pull request'lerde mevcut arayüz stilini koru ve hangi entegrasyonların gerçekten çalıştırıldığını açıkla.
+Hata bildirirken ajans veya müşteri akışını, talep türünü, gözlenen durumu ve tekrar adımlarını belirt. Örnek dosyalar kullan; portal token’larını, erişim bilgilerini ve müşteri verilerini çıkar.
 
-## Lisans ve kaynaklar
+## Lisans
 
-`package.json` içinde **ISC** belirtilir, ancak repoda bağımsız lisans dosyası bulunmaz. Bu belgeler lisans koşulu eklemez veya değiştirmez. Mevcut marka görselleri, yazı tipleri ve üçüncü taraf paketler kendi haklarını ve bildirimlerini korur.
+`package.json` içinde **ISC** belirtilir, ancak repoda ayrı bir lisans dosyası yoktur. Marka görselleri, yazı tipleri ve bağımlılıklar kendi haklarını ve bildirimlerini korur.
